@@ -54,7 +54,7 @@ DataRefiner is built using a Flask-based Python backend with a Bootstrap-powered
 
 2. Install dependencies:
    ```
-   pip install flask pandas nltk python-docx openpyxl
+   pip install flask pandas nltk python-docx openpyxl gunicorn
    ```
 
 3. Download NLTK resources:
@@ -63,12 +63,46 @@ DataRefiner is built using a Flask-based Python backend with a Bootstrap-powered
    nltk.download('words')
    ```
 
-4. Start the application:
-   ```
-   python main.py
-   ```
+## Starting the Application
 
-5. Access the application at: `http://localhost:5000`
+### Method 1: Using Python directly
+```
+python main.py
+```
+
+### Method 2: Using Gunicorn (recommended for production)
+```
+gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+```
+
+### Method 3: Using the shell script (Unix/Linux/Mac)
+```
+chmod +x start.sh
+./start.sh
+```
+
+### Method 4: Using the batch file (Windows)
+```
+start.bat
+```
+
+### Method 5: Using Docker
+```
+docker build -t datarefiner .
+docker run -p 5000:5000 datarefiner
+```
+
+### Method 6: Deploy to Heroku
+```
+git push heroku main
+```
+
+### Method 7: Deploy to Vercel
+```
+vercel --prod
+```
+
+After starting, access the application at: `http://localhost:5000`
 
 ## Usage
 
