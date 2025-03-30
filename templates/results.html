@@ -1,0 +1,247 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center mb-4">
+    <div class="col-md-10">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success bg-gradient text-white d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0"><i class="fas fa-check-circle me-2"></i>Data Processing Complete</h1>
+                <div>
+                    <a href="{{ url_for('reset') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-redo me-1"></i> New File
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success mb-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Your file <strong>{{ filename }}</strong> has been successfully processed and cleaned.
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h3 class="h5 mb-0">Before Cleaning</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Total Rows
+                                        <span class="badge bg-primary rounded-pill">{{ stats_before.row_count }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Total Columns
+                                        <span class="badge bg-primary rounded-pill">{{ stats_before.column_count }}</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            Missing Values
+                                            <span class="badge bg-warning rounded-pill">
+                                                {% set total_nulls = 0 %}
+                                                {% for col, count in stats_before.null_counts.items() %}
+                                                    {% set total_nulls = total_nulls + count %}
+                                                {% endfor %}
+                                                {{ total_nulls }}
+                                            </span>
+                                        </div>
+                                        {% if stats_before.null_counts %}
+                                            <div class="small">
+                                                <strong>Columns with missing data:</strong>
+                                                <ul class="mb-0">
+                                                    {% for col, count in stats_before.null_counts.items() %}
+                                                        <li>{{ col }}: {{ count }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h3 class="h5 mb-0">After Cleaning</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Total Rows
+                                        <span class="badge bg-success rounded-pill">{{ stats_after.row_count }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Total Columns
+                                        <span class="badge bg-success rounded-pill">{{ stats_after.column_count }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Removed Rows
+                                        <span class="badge bg-info rounded-pill">{{ stats_before.row_count - stats_after.row_count }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Missing Values
+                                        <span class="badge bg-success rounded-pill">0</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h3 class="h5 mb-0">Data Changes Summary</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <canvas id="changesChart" width="400" height="300"></canvas>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h4 class="h6 mb-3">Key Changes:</h4>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Rows with missing data removed
+                                                <span class="badge bg-danger rounded-pill">{{ stats_before.row_count - stats_after.row_count }}</span>
+                                            </li>
+                                            
+                                            {% set total_corrections = 0 %}
+                                            {% for column, fixes in corrections.items() %}
+                                                {% set total_corrections = total_corrections + fixes|length %}
+                                            {% endfor %}
+                                            
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Spelling errors corrected
+                                                <span class="badge bg-warning rounded-pill">{{ total_corrections }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if corrections %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h3 class="h5 mb-0"><i class="fas fa-spell-check me-2"></i>Spelling Corrections</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Column</th>
+                                                <th>Original Text</th>
+                                                <th>Corrected Text</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for column, fixes in corrections.items() %}
+                                                {% for original, corrected in fixes %}
+                                                <tr>
+                                                    <td>{{ column }}</td>
+                                                    <td class="text-danger">{{ original }}</td>
+                                                    <td class="text-success">{{ corrected }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if removed_rows %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h3 class="h5 mb-0"><i class="fas fa-trash-alt me-2"></i>Removed Rows with Missing Data</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    {{ removed_rows|length }} rows were removed due to missing data (row indices: {{ removed_rows|join(', ') }})
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <a href="{{ url_for('download') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-download me-2"></i> Download Cleaned Data
+                        </a>
+                        <a href="{{ url_for('reset') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                            <i class="fas fa-redo me-2"></i> Process Another File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create the changes chart
+        const ctx = document.getElementById('changesChart').getContext('2d');
+        
+        // Calculate chart data
+        const rowsRemoved = {{ stats_before.row_count - stats_after.row_count }};
+        
+        {% set total_corrections = 0 %}
+        {% for column, fixes in corrections.items() %}
+            {% set total_corrections = total_corrections + fixes|length %}
+        {% endfor %}
+        
+        const spellingCorrections = {{ total_corrections }};
+        
+        const changesChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Rows with Missing Data Removed', 'Spelling Corrections'],
+                datasets: [{
+                    data: [rowsRemoved, spellingCorrections],
+                    backgroundColor: [
+                        'rgba(220, 53, 69, 0.7)',  // Danger (red)
+                        'rgba(255, 193, 7, 0.7)'   // Warning (yellow)
+                    ],
+                    borderColor: [
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Data Cleaning Summary'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center mb-5">
+    <div class="col-md-10">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary bg-gradient text-white">
+                <h1 class="h3 mb-0"><i class="fas fa-file-alt me-2"></i>Document Data Cleaner</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2 class="h4">Clean & Refine Your Data</h2>
+                        <p class="lead">Upload various document formats to clean, correct spelling errors, and handle missing data.</p>
+                        
+                        <div class="mt-4 mb-4">
+                            <h3 class="h5"><i class="fas fa-check-circle text-success me-2"></i>Features</h3>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item bg-transparent"><i class="fas fa-spell-check me-2 text-info"></i>Spelling correction</li>
+                                <li class="list-group-item bg-transparent"><i class="fas fa-trash-alt me-2 text-info"></i>Missing data handling</li>
+                                <li class="list-group-item bg-transparent"><i class="fas fa-table me-2 text-info"></i>Data organization</li>
+                                <li class="list-group-item bg-transparent"><i class="fas fa-file-export me-2 text-info"></i>Export cleaned data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Supported Formats:</strong> Excel (.xlsx, .xls), CSV, Word (.docx, .doc), and Text files (.txt)
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h3 class="h4 mb-3 text-center">Upload Your Document</h3>
+                                
+                                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" class="mb-3">
+                                    <div class="mb-3 text-center">
+                                        <div class="upload-area p-5 border border-2 border-dashed rounded-3 mb-3">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                                            <h4 class="h5">Drag & Drop Files Here</h4>
+                                            <p class="text-muted small">or click to select files</p>
+                                            <input type="file" name="file" id="file-input" class="form-control visually-hidden">
+                                        </div>
+                                        <div id="file-name" class="text-muted small mt-2">No file selected</div>
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-magic me-2"></i> Process Data
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="about-section" class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-secondary bg-gradient text-white">
+                <h2 class="h4 mb-0"><i class="fas fa-info-circle me-2"></i>How It Works</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3 class="h5">Upload Your Document</h3>
+                                    <p>Start by uploading your Excel, Word, CSV, or text document containing the data you want to clean.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3 class="h5">Automated Processing</h3>
+                                    <p>Our system analyzes your data, identifies spelling errors, and detects missing data points.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-spell-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3 class="h5">Spelling Correction</h3>
+                                    <p>Misspelled words are automatically corrected using linguistic analysis and dictionary matching.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-table"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3 class="h5">Data Organization</h3>
+                                    <p>Rows with missing data are identified and removed to create a clean, consistent dataset.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary">
+                                    <i class="fas fa-file-download"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h3 class="h5">Download Clean Data</h3>
+                                    <p>Download your refined data in the original format, ready for further analysis or use.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropArea = document.querySelector('.upload-area');
+        const fileInput = document.getElementById('file-input');
+        const fileName = document.getElementById('file-name');
+        
+        // Trigger file input when clicking on drop area
+        dropArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Update file name display when file is selected
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+                dropArea.classList.add('border-success');
+                dropArea.classList.remove('border-dashed');
+            } else {
+                fileName.textContent = 'No file selected';
+                dropArea.classList.remove('border-success');
+                dropArea.classList.add('border-dashed');
+            }
+        });
+        
+        // Handle drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.classList.add('border-primary');
+        }
+        
+        function unhighlight() {
+            dropArea.classList.remove('border-primary');
+        }
+        
+        // Handle file drop
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileName.textContent = files[0].name;
+                dropArea.classList.add('border-success');
+                dropArea.classList.remove('border-dashed');
+            }
+        }
+    });
+</script>
+{% endblock %}

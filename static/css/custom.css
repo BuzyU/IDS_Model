@@ -1,0 +1,85 @@
+/* Custom styling for DataRefiner application */
+
+/* Timeline styling for How It Works section */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15px;
+    height: 100%;
+    width: 2px;
+    background: var(--bs-primary);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 40px;
+}
+
+.timeline-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.timeline-content h3 {
+    margin-top: 0;
+}
+
+/* Upload area styling */
+.upload-area {
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+/* General UI improvements */
+.card {
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.btn {
+    transition: all 0.2s;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .timeline:before {
+        left: 10px;
+    }
+    
+    .timeline-item {
+        padding-left: 30px;
+    }
+    
+    .timeline-marker {
+        width: 20px;
+        height: 20px;
+        font-size: 0.8rem;
+    }
+}
